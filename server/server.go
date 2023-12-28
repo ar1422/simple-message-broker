@@ -2,6 +2,7 @@ package server
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -15,7 +16,14 @@ func extractCommand() string {
 
 }
 
+func userInfoMessages() {
+	fmt.Println("<---------------------------------------------------------------------------------------------->")
+	fmt.Println("Enter the command:")
+	fmt.Println("options: put_async <message>| put_sync <message>| get | create_topic <topic_name>| publish <topic> <message> | exit")
+}
+
 func commandProcessor() {
+	userInfoMessages()
 	var command = extractCommand()
 
 	switch command {

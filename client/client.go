@@ -17,7 +17,7 @@ func extractCommand() string {
 }
 
 func userInfoMessages() {
-	fmt.Println("<------------------------------------------------------->")
+	fmt.Println("<---------------------------------------------------------------------------------------------->")
 	fmt.Println("Enter the command:")
 	fmt.Println("options: get | put <message> | subscribe <topic> | unsubscribe <topic> | exit")
 }
