@@ -2,6 +2,7 @@ package client
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -15,7 +16,14 @@ func extractCommand() string {
 
 }
 
+func userInfoMessages() {
+	fmt.Println("<------------------------------------------------------->")
+	fmt.Println("Enter the command:")
+	fmt.Println("options: get | put <message> | subscribe <topic> | unsubscribe <topic> | exit")
+}
+
 func commandProcessor() {
+	userInfoMessages()
 	var command = extractCommand()
 
 	switch command {
