@@ -50,3 +50,9 @@ func commandProcessor() {
 	}
 
 }
+
+func Run() {
+	for {
+		commandProcessor()
+	}
+}

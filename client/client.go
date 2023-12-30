@@ -3,7 +3,9 @@ package client
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"message_broker/communication_protocol"
+	"message_broker/configuration"
 	"net"
 	"os"
 	"strings"
@@ -70,6 +72,14 @@ func listenToUpdates(connection net.Conn) {
 	}
 }
 
+func connectToSubscribeService() net.Conn {
+	con, err := net.Dial("tcp", configuration.GetRPCAddress())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return con
+}
+
 func commandProcessor(connection net.Conn) {
 	userInfoMessages()
 	var command, arguments = extractCommand()
@@ -97,6 +107,14 @@ func commandProcessor(connection net.Conn) {
 
 	default:
 		fmt.Println("Invalid command. Please try again... ")
+	}
+}
+
+func Run() {
+	con := connectToSubscribeService()
+	defer con.Close()
+	for {
+		commandProcessor(con)
 	}
 
 }
