@@ -3,17 +3,27 @@ package server
 import (
 	"bufio"
 	"fmt"
+	"message_broker/communication_protocol"
 	"os"
 	"strings"
 )
 
-func extractCommand() string {
+func extractCommand() (string, string) {
 	bufferReader := bufio.NewReader(os.Stdin)
 	var command string
 	command, _ = bufferReader.ReadString('\n')
 	command = strings.TrimSuffix(command, "\n")
-	return strings.Split(command, " ")[0]
+	splitValues := strings.SplitN(command, " ", 2)
+	return splitValues[0], splitValues[1]
+}
 
+func putMessageHandler(message string, isAsync bool) bool {
+	args := communication_protocol.PutMessageArgs{Message: message, IsAsync: isAsync}
+	reply := communication_protocol.PutMessageReply{}
+	if !communication_protocol.Call("Broker.PutMessage", &args, &reply) {
+		os.Exit(0)
+	}
+	return reply.IsBufferOverflow
 }
 
 func userInfoMessages() {
@@ -24,17 +34,27 @@ func userInfoMessages() {
 
 func commandProcessor() {
 	userInfoMessages()
-	var command = extractCommand()
+	var command, arguments = extractCommand()
 
 	switch command {
 	case get:
 		break
 
 	case put_sync:
-		break
+		status := putMessageHandler(arguments, false)
+		if status {
+			fmt.Println("Ran into error while sending the message")
+		} else {
+			fmt.Println("Message sent successfully.")
+		}
 
 	case put_async:
-		break
+		status := putMessageHandler(arguments, true)
+		if status {
+			fmt.Println("Ran into error while sending the message")
+		} else {
+			fmt.Println("Message sent successfully.")
+		}
 
 	case publish:
 		break
@@ -43,10 +63,10 @@ func commandProcessor() {
 		break
 
 	case exit:
-		break
+		os.Exit(0)
 
 	default:
-		break
+		fmt.Println("Invalid command. Please try again... ")
 	}
 
 }
