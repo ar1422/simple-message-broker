@@ -14,7 +14,11 @@ func extractCommand() (string, string) {
 	command, _ = bufferReader.ReadString('\n')
 	command = strings.TrimSuffix(command, "\n")
 	splitValues := strings.SplitN(command, " ", 2)
-	return splitValues[0], splitValues[1]
+	if len(splitValues) == 1 {
+		return splitValues[0], ""
+	} else {
+		return splitValues[0], splitValues[1]
+	}
 }
 
 func putMessageHandler(message string, isAsync bool) bool {
@@ -24,6 +28,33 @@ func putMessageHandler(message string, isAsync bool) bool {
 		os.Exit(0)
 	}
 	return reply.IsBufferOverflow
+}
+
+func CallForCreateTopic(topic string) communication_protocol.CreateTopicReply {
+	args := communication_protocol.CreateTopicArgs{TopicName: topic}
+	reply := communication_protocol.CreateTopicReply{}
+	if !communication_protocol.Call("Broker.CreateTopic", &args, &reply) {
+		os.Exit(0)
+	}
+	return reply
+}
+
+func CallForPublish(topic string, message string) communication_protocol.PublishReply {
+	args := communication_protocol.PublishArgs{TopicName: topic, Message: message}
+	reply := communication_protocol.PublishReply{}
+	if !communication_protocol.Call("Broker.Publish", &args, &reply) {
+		os.Exit(0)
+	}
+	return reply
+}
+
+func CallForGetBackMessage() communication_protocol.GetBackMessageReply {
+	args := communication_protocol.GetBackMessageArgs{}
+	reply := communication_protocol.GetBackMessageReply{}
+	if !communication_protocol.Call("Broker.GetBackMessage", &args, &reply) {
+		os.Exit(0)
+	}
+	return reply
 }
 
 func userInfoMessages() {
@@ -38,7 +69,13 @@ func commandProcessor() {
 
 	switch command {
 	case get:
-		break
+		reply := CallForGetBackMessage()
+		message := reply.Message
+		if message == "" {
+			fmt.Println("No message to get back")
+		} else {
+			fmt.Println("Message: " + message)
+		}
 
 	case put_sync:
 		status := putMessageHandler(arguments, false)
@@ -57,10 +94,13 @@ func commandProcessor() {
 		}
 
 	case publish:
-		break
+		splitArguments := strings.SplitN(arguments, " ", 2)
+		CallForPublish(splitArguments[0], splitArguments[1])
+		fmt.Println("Message published successfully")
 
 	case create_topic:
-		break
+		CallForCreateTopic(arguments)
+		fmt.Println("Topic created successfully")
 
 	case exit:
 		os.Exit(0)

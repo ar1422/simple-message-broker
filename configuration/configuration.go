@@ -18,7 +18,7 @@ type Configuration struct {
 }
 
 func readConfig() Configuration {
-	f, err := os.Open("../config.json")
+	f, err := os.Open("config.json")
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +40,7 @@ func GetRPCPort() int {
 
 func GetRPCAddress() string {
 
-	return fmt.Sprintf("%s:%d", GetRPCHost(), GetRPCHost())
+	return fmt.Sprintf("%s:%d", GetRPCHost(), GetRPCPort())
 }
 
 func GetPubSubHost() string {
@@ -49,4 +49,9 @@ func GetPubSubHost() string {
 
 func GetPubSubPort() int {
 	return readConfig().PubSubService.Port
+}
+
+func GetPubSubAddress() string {
+
+	return fmt.Sprintf("%s:%d", GetPubSubHost(), GetPubSubPort())
 }

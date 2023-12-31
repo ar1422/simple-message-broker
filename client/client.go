@@ -17,7 +17,11 @@ func extractCommand() (string, string) {
 	command, _ = bufferReader.ReadString('\n')
 	command = strings.TrimSuffix(command, "\n")
 	splitValues := strings.SplitN(command, " ", 2)
-	return splitValues[0], splitValues[1]
+	if len(splitValues) == 1 {
+		return splitValues[0], ""
+	} else {
+		return splitValues[0], splitValues[1]
+	}
 }
 
 func userInfoMessages() {
@@ -60,7 +64,12 @@ func putMessageHandler(message string) bool {
 
 }
 
+func listenForStatus(connection net.Conn) bool {
+	return true
+}
+
 func listenToUpdates(connection net.Conn) {
+
 	reader := bufio.NewReader(connection)
 	for {
 		message, _ := reader.ReadString('\n')
@@ -73,7 +82,7 @@ func listenToUpdates(connection net.Conn) {
 }
 
 func connectToSubscribeService() net.Conn {
-	con, err := net.Dial("tcp", configuration.GetRPCAddress())
+	con, err := net.Dial("tcp", configuration.GetPubSubAddress())
 	if err != nil {
 		log.Fatalln(err)
 	}
