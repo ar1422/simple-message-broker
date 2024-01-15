@@ -12,6 +12,7 @@ import (
 )
 
 func extractCommand() (string, string) {
+
 	bufferReader := bufio.NewReader(os.Stdin)
 	var command string
 	command, _ = bufferReader.ReadString('\n')
